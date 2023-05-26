@@ -1,12 +1,11 @@
 using System.Text.Json.Serialization;
 using BasicMinimalApi;
 
-var builder = WebApplication.CreateSlimBuilder(args);
-builder.Logging.ClearProviders();
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+    options.SerializerOptions.TypeInfoResolver = AppJsonSerializerContext.Default;
 });
 
 var app = builder.Build();
@@ -20,11 +19,9 @@ todosApi.MapGet("/{id}", (int id) =>
         ? Results.Ok(todo)
         : Results.NotFound());
 
-app.Lifetime.ApplicationStarted.Register(() => Console.WriteLine("Application started. Press Ctrl+C to shut down."));
 app.Run();
 
 [JsonSerializable(typeof(Todo[]))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
-
 }
